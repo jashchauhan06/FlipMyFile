@@ -1,0 +1,542 @@
+.section {
+    background: var(--color-bg);
+}
+
+.workspace {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* ---- DROP ZONE ---- */
+.dropzone {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 56px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    background: var(--color-surface);
+}
+
+.dropzone:hover,
+.dropzone.active {
+    border-color: var(--color-primary);
+    background: rgba(249, 115, 22, 0.04);
+}
+
+.fileInput {
+    display: none;
+}
+
+.dropzoneIcon {
+    color: var(--color-primary);
+    margin-bottom: 16px;
+}
+
+.dropzoneTitle {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--color-text);
+}
+
+.dropzoneSub {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.browse {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.dropzoneHint {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+/* ---- CONVERTER UI ---- */
+.converter {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.03),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.previewArea {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    max-height: 300px;
+}
+
+.previewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: 300px;
+}
+
+.videoPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text-muted);
+    padding: 48px;
+}
+
+.videoPlaceholder span {
+    font-weight: 600;
+}
+
+.fileInfo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    gap: 16px;
+}
+
+.fileDetails {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.iconWrap {
+    color: var(--color-primary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.fileNameWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.fileName {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.fileName:hover {
+    color: var(--color-primary);
+}
+
+.editBtn {
+    opacity: 0;
+    color: var(--color-text-muted);
+    transition: all 0.2s ease;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.fileNameWrap:hover .editBtn {
+    opacity: 1;
+}
+
+.editBtn:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-text);
+}
+
+.renameInputWrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.renameInput {
+    background: var(--color-surface);
+    border: 1px solid var(--color-primary);
+    color: var(--color-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+}
+
+.iconBtn {
+    color: var(--color-primary);
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.iconBtn:hover {
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.fileSize {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.deleteBtn {
+    color: var(--color-text-muted);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deleteBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.formatGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.formatBtn {
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.formatBtn:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+}
+
+.formatActive {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+/* Progress */
+.progressWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progressTrack {
+    flex: 1;
+    height: 6px;
+    background: var(--color-bg);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progressBar {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.15s ease;
+}
+
+.progressDone {
+    background: #22c55e;
+}
+
+.progressText {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text);
+    min-width: 54px;
+    text-align: right;
+}
+
+.funMessage {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    font-style: italic;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .converter {
+        padding: 16px;
+    }
+
+    .dropzone {
+        padding: 40px 16px;
+    }
+}
+
+/* File List for Multiple Uploads */
+.fileList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 4px;
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}
+
+.fileList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fileList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fileList::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 20px;
+}
+
+.fileItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.fileItem.done {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.fileItemInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.fileItemIcon {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.fileItemName {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fileItemSize {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.fileItemStatus {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.statusText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.statusText.success {
+    color: #22c55e;
+}
+
+.removeFileBtn {
+    color: var(--color-text-muted);
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.removeFileBtn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.batchActions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+}
+
+/* Mode Switcher */
+.modeTabs {
+    display: flex;
+    background: var(--color-bg);
+    padding: 4px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    gap: 4px;
+}
+
+.modeBtn {
+    flex: 1;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.modeBtn:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.modeActive {
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Compression Options */
+.compressionOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.qualityGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.qualityBtn {
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    text-align: center;
+    transition: all 0.2s ease;
+    color: var(--color-text);
+}
+
+.qualityBtn:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-bg-secondary);
+}
+
+.qualityActive {
+    background: rgba(249, 115, 22, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.qualityLabel {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.qualityDesc {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    line-height: 1.2;
+}
+
+.qualityActive .qualityDesc {
+    color: var(--color-primary);
+    opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+    .qualityGrid {
+        grid-template-columns: 1fr;
+    }
+}

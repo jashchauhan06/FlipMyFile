@@ -1,0 +1,116 @@
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 0 80px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+}
+
+/* ---- Left column ---- */
+.left {
+    max-width: 520px;
+}
+
+.eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    letter-spacing: 0.02em;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+    margin-bottom: 20px;
+}
+
+.accent {
+    color: var(--color-primary);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+/* Trust row */
+.trust {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.trustItem {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.trustItem strong {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+.trustDot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+/* ---- Right column — Converter embedded ---- */
+.right {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+    .hero {
+        padding: 120px 0 64px;
+        /* More top padding for nav pill space */
+        min-height: auto;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    .right {
+        justify-content: center;
+    }
+
+    .mockup {
+        max-width: 360px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 2rem;
+    }
+}
