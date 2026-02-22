@@ -49,10 +49,10 @@ export default function Hero() {
 
                     <div className={styles.trust}>
                         <span className={styles.trustItem}>
-                            <strong>2.4M+</strong> files flipped
+                            <strong>100%</strong> client-side processing
                         </span>
                         <span className={styles.trustItem}>
-                            Auto-deletes in 30min
+                            Instant conversion
                         </span>
                         <span className={styles.trustItem}>
                             No signup needed

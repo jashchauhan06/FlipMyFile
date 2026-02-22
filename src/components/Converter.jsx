@@ -1,4 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+"use client";
+
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useToast } from "./Toast";
 import { Trash2, FileText, Check, Download, Video, Image as ImageIcon, X } from "lucide-react";
 import styles from "./Converter.module.css";
@@ -8,6 +10,8 @@ const IMAGE_FORMATS = ["JPG", "PNG", "WebP", "GIF", "BMP", "TIFF", "ICO"];
 const VIDEO_FORMATS = ["MP4", "MOV", "AVI", "WebM", "MKV", "FLV", "WMV"];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
+let pdfjsLib = null;
 
 const FUN_MESSAGES = [
     "Flipping your files…",
@@ -31,6 +35,73 @@ function formatBytes(bytes) {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+}
+
+// PDF to Images Conversion
+async function convertPdfToImages(file, outputFormat, onProgress) {
+    // Lazy load pdfjs only on client side
+    if (!pdfjsLib) {
+        try {
+            pdfjsLib = await import("pdfjs-dist");
+            // Use the worker from CDN
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        } catch (error) {
+            console.error("Failed to load pdfjs-dist:", error);
+            throw new Error("Failed to load PDF library");
+        }
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const totalPages = pdf.numPages;
+        const images = [];
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+            try {
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 2 }); // 2x scale for better quality
+
+                const canvas = document.createElement("canvas");
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    throw new Error("Failed to get canvas context");
+                }
+
+                await page.render({ canvasContext: context, viewport }).promise;
+
+                // Convert canvas to blob in the desired format
+                const blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            resolve(blob);
+                        } else {
+                            reject(new Error("Failed to convert canvas to blob"));
+                        }
+                    }, `image/${outputFormat.toLowerCase()}`, 0.95);
+                });
+
+                images.push({
+                    blob,
+                    pageNum
+                });
+
+                // Update progress
+                onProgress(Math.round((pageNum / totalPages) * 100));
+            } catch (pageError) {
+                console.error(`Error processing page ${pageNum}:`, pageError);
+                throw pageError;
+            }
+        }
+
+        return images;
+    } catch (error) {
+        console.error("PDF conversion error:", error);
+        throw error;
+    }
 }
 
 export default function Converter({ minimal = false }) {
@@ -80,14 +151,62 @@ export default function Converter({ minimal = false }) {
 
     const onDrop = useCallback((e) => {
         e.preventDefault();
+        e.stopPropagation();
         setDragActive(false);
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             addFiles(e.dataTransfer.files);
         }
     }, [addFiles]);
 
-    const onDragOver = (e) => { e.preventDefault(); setDragActive(true); };
-    const onDragLeave = () => setDragActive(false);
+    const onDragOver = (e) => { 
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(true); 
+    };
+    
+    const onDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+    };
+
+    // Set up page-level drag and drop
+    useEffect(() => {
+        const handleDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragActive(true);
+        };
+
+        const handleDragLeave = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Only set to false if leaving the window entirely
+            if (e.clientX === 0 && e.clientY === 0) {
+                setDragActive(false);
+            }
+        };
+
+        const handleDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragActive(false);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                addFiles(e.dataTransfer.files);
+            }
+        };
+
+        document.addEventListener("dragover", handleDragOver);
+        document.addEventListener("dragleave", handleDragLeave);
+        document.addEventListener("drop", handleDrop);
+
+        return () => {
+            document.removeEventListener("dragover", handleDragOver);
+            document.removeEventListener("dragleave", handleDragLeave);
+            document.removeEventListener("drop", handleDrop);
+        };
+    }, [addFiles]);
+
     const onInputChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             addFiles(e.target.files);
@@ -191,12 +310,33 @@ export default function Converter({ minimal = false }) {
                     setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: 30 } : f));
                     resultBlob = await compressImage(currentFileObj.file, compressionLevel);
                     setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: 70 } : f));
+                } else if (mode === "convert" && currentFileObj.type === "pdf") {
+                    // PDF to Images Conversion
+                    const images = await convertPdfToImages(currentFileObj.file, outputFormat, (progress) => {
+                        setFiles(prev => prev.map(f => f.id === id ? { ...f, progress } : f));
+                    });
+
+                    // If single page, return single image
+                    if (images.length === 1) {
+                        resultBlob = images[0].blob;
+                        resultUrl = URL.createObjectURL(resultBlob);
+                    } else {
+                        // Multiple pages - create ZIP
+                        const zip = new JSZip();
+                        images.forEach((img, idx) => {
+                            zip.file(`page_${img.pageNum}.${outputFormat.toLowerCase()}`, img.blob);
+                        });
+                        resultBlob = await zip.generateAsync({ type: "blob" });
+                        resultUrl = URL.createObjectURL(resultBlob);
+                    }
                 } else {
-                    // Mock Convert / Video / PDF
+                    // Mock Convert / Video
                     await new Promise(r => setTimeout(r, 800));
                 }
 
-                resultUrl = URL.createObjectURL(resultBlob);
+                if (!resultUrl) {
+                    resultUrl = URL.createObjectURL(resultBlob);
+                }
 
                 setFiles(prev => prev.map(f => {
                     if (f.id === id) {
@@ -245,7 +385,13 @@ export default function Converter({ minimal = false }) {
 
             const baseName = f.originalName.replace(/\.[^/.]+$/, "");
             a.href = f.resultUrl;
-            a.download = `${baseName}${suffix ? '_' + suffix : ''}.${ext}`;
+            
+            // For PDF conversions with multiple pages, the result is a ZIP
+            if (f.type === "pdf" && mode === "convert") {
+                a.download = `${baseName}_pages.zip`;
+            } else {
+                a.download = `${baseName}${suffix ? '_' + suffix : ''}.${ext}`;
+            }
             a.click();
         } else {
             // Zip Download
@@ -306,9 +452,6 @@ export default function Converter({ minimal = false }) {
             {files.length === 0 ? (
                 <div
                     className={`${styles.dropzone} ${dragActive ? styles.active : ""}`}
-                    onDrop={onDrop}
-                    onDragOver={onDragOver}
-                    onDragLeave={onDragLeave}
                     onClick={() => inputRef.current?.click()}
                     id="dropzone"
                     role="button"
